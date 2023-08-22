@@ -1,0 +1,15 @@
+"ID"	"Cell_line"	"phenotype"	"Replicate"	"contrast"	"total_norm"
+"Ly8_KO_G6_1"	"Ly8_KO_G6_1"	"Ly8"	"ko"	1	"mut"	2485984.36891276
+"Ly8_KO_G6_2"	"Ly8_KO_G6_2"	"Ly8"	"ko"	2	"mut"	2389367.46094199
+"Ly8_cas9_11_1"	"Ly8_cas9_11_1"	"Ly8"	"wt"	1	"wt"	2436406.16144852
+"Ly8_cas9_11_2"	"Ly8_cas9_11_2"	"Ly8"	"wt"	2	"wt"	2491162.7741523
+"Ly8_cas9_3_1"	"Ly8_cas9_3_1"	"Ly8"	"wt"	1	"wt"	2514418.62047447
+"Ly8_cas9_3_2"	"Ly8_cas9_3_2"	"Ly8"	"wt"	2	"wt"	2430027.17917126
+"Ly8_cas9_6_1"	"Ly8_cas9_6_1"	"Ly8"	"wt"	1	"wt"	2393068.03737377
+"Ly8_cas9_6_2"	"Ly8_cas9_6_2"	"Ly8"	"wt"	2	"wt"	2865350.14620587
+"Ly8_het_A9_1"	"Ly8_het_A9_1"	"Ly8"	"het"	1	"mut"	2313916.61815012
+"Ly8_het_A9_2"	"Ly8_het_A9_2"	"Ly8"	"het"	2	"mut"	2658146.98645541
+"Ly8_het_G10_1"	"Ly8_het_G10_1"	"Ly8"	"het"	1	"mut"	2420522.69361065
+"Ly8_het_G10_2"	"Ly8_het_G10_2"	"Ly8"	"het"	2	"mut"	2504908.88912214
+"Ly8_het_G5_1"	"Ly8_het_G5_1"	"Ly8"	"het"	1	"mut"	2431766.34460868
+"Ly8_het_G5_2"	"Ly8_het_G5_2"	"Ly8"	"het"	2	"mut"	2889440.06100874
