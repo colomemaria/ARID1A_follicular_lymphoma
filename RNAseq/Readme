@@ -1,5 +1,1 @@
-- QC_normalization_DEG -> link FASTQ files, link raw counts, link norm counts, DEG say which suppl tables
-- visualization:
-  -- FAS expression
-  -- ETS1 expression
-  -- RUNX3 expression
+- QC_normalization_DEG -> link FASTQ files
