@@ -1,1 +1,6 @@
-
+The original coordinates are given in hg18 format (cloned_regions_hg18.bed). 
+The conversion to hg38 was done using http://genome.ucsc.edu/cgi-bin/hgLiftOver tool (cloned_regions_hg38.bed).
+The following lines were added manually:
+browser position chr10:88990798-89017059
+track name=Cloned FAS promoter reporter assay description=" " visibility=2 color=160,32,240
+#chrom chromStart chromEnd
