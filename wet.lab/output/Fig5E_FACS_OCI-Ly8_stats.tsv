@@ -1,0 +1,3 @@
+comparison	p.value	p.adj
+het+RUNX3 vs het	0.0625	0.125
+het+RUNX3 vs WT	0.625	1

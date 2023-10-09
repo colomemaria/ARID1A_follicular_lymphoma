@@ -1,0 +1,13 @@
+comparison	p.value	p.adj
+het 0 ng vs WT 0 ng	0.4	1
+het+RUNX3 0 ng vs WT 0 ng	1	1
+KO 0 ng vs WT 0 ng	0.4	1
+het 3 ng vs WT 3 ng	0.1	1
+het+RUNX3 3 ng vs WT 3 ng	1	1
+KO 3 ng vs WT 3 ng	0.1	1
+het 30 ng vs WT 30 ng	0.1	1
+het+RUNX3 30 ng vs WT 30 ng	0.4	1
+KO 30 ng vs WT 30 ng	0.1	1
+het 300 ng vs WT 300 ng	0.1	1
+het+RUNX3 300 ng vs WT 300 ng	0.2	1
+KO 300 ng vs WT 300 ng	0.1	1
