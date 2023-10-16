@@ -1,17 +1,17 @@
-"ID"	"Cell_line"	"phenotype"	"Replicate"	"contrast"	"total_norm"
-"Ly1_KO_E8_1"	"Ly1_KO_E8_1"	"Ly1"	"ko"	1	"mut"	2751746.58749314
-"Ly1_KO_E8_2"	"Ly1_KO_E8_2"	"Ly1"	"ko"	2	"mut"	2611113.17703798
-"Ly1_KO_G1_1"	"Ly1_KO_G1_1"	"Ly1"	"ko"	1	"mut"	2641137.48711032
-"Ly1_KO_G1_2"	"Ly1_KO_G1_2"	"Ly1"	"ko"	2	"mut"	2498572.79994034
-"Ly1_KO_H3_1"	"Ly1_KO_H3_1"	"Ly1"	"ko"	1	"mut"	2528533.81189969
-"Ly1_KO_H3_2"	"Ly1_KO_H3_2"	"Ly1"	"ko"	2	"mut"	2527582.64597983
-"Ly1_cas9_1_1"	"Ly1_cas9_1_1"	"Ly1"	"wt"	1	"wt"	2555634.13872772
-"Ly1_cas9_1_2"	"Ly1_cas9_1_2"	"Ly1"	"wt"	2	"wt"	2497546.75609644
-"Ly1_cas9_7_1"	"Ly1_cas9_7_1"	"Ly1"	"wt"	1	"wt"	2459377.8289281
-"Ly1_cas9_7_2"	"Ly1_cas9_7_2"	"Ly1"	"wt"	2	"wt"	2457051.93924391
-"Ly1_cas9_9_1"	"Ly1_cas9_9_1"	"Ly1"	"wt"	1	"wt"	2439849.24318634
-"Ly1_cas9_9_2"	"Ly1_cas9_9_2"	"Ly1"	"wt"	2	"wt"	2421814.81541313
-"Ly1_het_F10_1"	"Ly1_het_F10_1"	"Ly1"	"het"	1	"mut"	2548391.53399334
-"Ly1_het_F10_2"	"Ly1_het_F10_2"	"Ly1"	"het"	2	"mut"	2524863.71402911
-"Ly1_het_F9_1"	"Ly1_het_F9_1"	"Ly1"	"het"	1	"mut"	2637104.64478313
-"Ly1_het_F9_2"	"Ly1_het_F9_2"	"Ly1"	"het"	2	"mut"	2667590.03542969
+"ID"	"Cell_line"	"phenotype"	"tech_replicate"	"contrast"	"clone"	"total_raw"	"total_norm"
+"Ly1_KO_E8_1"	"Ly1_KO_E8_1"	"Ly1"	"ko"	1	"mut"	"E8"	2172364	5246735.03871582
+"Ly1_KO_E8_2"	"Ly1_KO_E8_2"	"Ly1"	"ko"	2	"mut"	"E8"	3329813	5087061.72689112
+"Ly1_KO_G1_1"	"Ly1_KO_G1_1"	"Ly1"	"ko"	1	"mut"	"G1"	2908952	5031033.89675919
+"Ly1_KO_G1_2"	"Ly1_KO_G1_2"	"Ly1"	"ko"	2	"mut"	"G1"	2904581	5542996.7665493
+"Ly1_KO_H3_1"	"Ly1_KO_H3_1"	"Ly1"	"ko"	1	"mut"	"H3"	3189437	5275200.98729538
+"Ly1_KO_H3_2"	"Ly1_KO_H3_2"	"Ly1"	"ko"	2	"mut"	"H3"	4125280	5517371.23834172
+"Ly1_cas9_1_1"	"Ly1_cas9_1_1"	"Ly1"	"wt"	1	"wt"	"1"	2340142	5344506.77230308
+"Ly1_cas9_1_2"	"Ly1_cas9_1_2"	"Ly1"	"wt"	2	"wt"	"1"	2420822	5231060.33403981
+"Ly1_cas9_7_1"	"Ly1_cas9_7_1"	"Ly1"	"wt"	1	"wt"	"7"	3064322	5246735.03871582
+"Ly1_cas9_7_2"	"Ly1_cas9_7_2"	"Ly1"	"wt"	2	"wt"	"7"	4646670	5087061.72689112
+"Ly1_cas9_9_1"	"Ly1_cas9_9_1"	"Ly1"	"wt"	1	"wt"	"9"	1561394	5031033.89675919
+"Ly1_cas9_9_2"	"Ly1_cas9_9_2"	"Ly1"	"wt"	2	"wt"	"9"	3638340	5542996.7665493
+"Ly1_het_F10_1"	"Ly1_het_F10_1"	"Ly1"	"het"	1	"mut"	"F10"	1198520	5275200.98729538
+"Ly1_het_F10_2"	"Ly1_het_F10_2"	"Ly1"	"het"	2	"mut"	"F10"	2667532	5517371.23834172
+"Ly1_het_F9_1"	"Ly1_het_F9_1"	"Ly1"	"het"	1	"mut"	"F9"	2717030	5344506.77230308
+"Ly1_het_F9_2"	"Ly1_het_F9_2"	"Ly1"	"het"	2	"mut"	"F9"	3861305	5231060.33403981

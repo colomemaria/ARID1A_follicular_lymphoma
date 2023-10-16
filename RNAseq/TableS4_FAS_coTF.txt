@@ -19,5 +19,4 @@ ZNF136	FAS_TF_non.de
 ZNF140	FAS_TF_non.de
 ZNF267	FAS_TF_non.de
 RUNX3	coTF_down
-ZFAT	coTF_down
 ZNF32	coTF_up
