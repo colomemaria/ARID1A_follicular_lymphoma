@@ -1,0 +1,4 @@
+comparison	p.value	p.adj
+het vs WT	0.4	1
+KO vs WT	0.268285883677117	0.804857651031352
+het+ARID1A vs WT	0.7	1
