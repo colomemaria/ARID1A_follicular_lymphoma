@@ -1,3 +1,6 @@
+# install.packages("coin")
+require(coin)
+
 t_test <- function(data
                   ,...){
     t.test(value~group
@@ -17,13 +20,10 @@ welch_test <- function(data
 
 mann_whitney_u_test <- function(data
                                ,...){
-    wilcox.test(value~group
-                ,data
-                ,exact = NULL
-                ,correct = TRUE
-                ,conf.int = FALSE
-                ,...
-               )
+    coin::wilcox_test(value~group
+                      ,data
+                      ,...
+                     )
 }
 
 moods_median_test <- function(data
@@ -116,7 +116,7 @@ run_statistics <- function(experiment
     } else if(which_test == "Welch test"){
         welch_test(data, paired = paired)$p.value
     } else if(which_test == "Mann-Whitney U-test"){
-        mann_whitney_u_test(data, paired = paired)$p.value
+        pvalue(mann_whitney_u_test(data, paired = paired))
     } else if(which_test == "Mood's Median-test"){
         moods_median_test(data)$p.value
     } else error("ERROR: undefined test")
@@ -128,7 +128,10 @@ run_statistics <- function(experiment
                           group2 <- sub(".* vs ","",comparison)
                           
                           idx <- data$group %in% c(group1, group2)
-                          run_one_comparison(data[idx,])
+                          data_sub <- data[idx,]
+                          # make the group column values as factor
+                          data_sub$group <- as.factor(data_sub$group)
+                          run_one_comparison(data_sub)
                       })
     
     # adjust for multiple testing if needed
@@ -190,6 +193,113 @@ run_statistics <- function(experiment
     
 }
 
+# linear regression
+run_regression <- function(experiment
+                           ,formula
+                           ,data
+                          ,export_results = TRUE
+                          ){
+    fit <- lm(formula, data)
+    print(summary(fit))
+    # export results
+    output <- summary(fit)$coefficients
+    if(export_results){
+        write.table(output
+                 ,file = paste0("./output/"
+                                ,experiment
+                                ,"_stats.tsv"
+                                )
+                 ,sep = "\t"
+                 ,quote = FALSE
+                 ,col.names = TRUE
+                 ,row.names = FALSE)
+    }
+    fit
+}
+
+compare_several_fits <- function(experiment
+                                ,fit
+                                 ,X
+                                 ,var
+                                ){
+    test.lst <- lstrends(fit, X, var)
+    test.lst
+    
+    # Compare slopes
+    pairs(test.lst)
+    print(summary(pairs(test.lst)))
+    
+    # export output
+    output <- summary(pairs(test.lst))
+    write.table(output
+                 ,file = paste0("./output/"
+                                ,experiment
+                                ,"_stats.tsv"
+                                )
+                 ,sep = "\t"
+                 ,quote = FALSE
+                 ,col.names = TRUE
+                 ,row.names = FALSE)
+    
+    # plot
+    data$log10_value <- log10(data$value)
+    data$log10_dose <- log10(data$dose +1)
+    plotly_interaction(data
+                       ,x = "log10_dose"
+                       ,y = "log10_value"
+                       ,category = "genotype"
+                      ,colors=col2rgb(c("black"
+                               ,"lightblue"
+                               ,"blue"
+                               ,"red")))
+}
+
+plotly_interaction <- function(data
+                               , x
+                               , y
+                               , category
+                               , colors = col2rgb(viridis(nlevels(as.factor(data[[category]]))))
+                               , ...) {
+  # Create Plotly scatter plot of x vs y, with separate lines for each level of the categorical variable. 
+  # In other words, create an interaction scatter plot.
+  # The "colors" must be supplied in a RGB triplet, as produced by col2rgb().
+
+  require(plotly)
+  require(viridis)
+  require(broom)
+
+  groups <- unique(data[[category]])
+
+  p <- plot_ly(...)
+
+  for (i in 1:length(groups)) {
+    groupData = data[which(data[[category]]==groups[[i]]), ]
+    p <- add_lines(p, data = groupData,
+                   y = fitted(lm(data = groupData, groupData[[y]] ~ groupData[[x]])),
+                   x = groupData[[x]],
+                   line = list(color = paste('rgb', '(', paste(colors[, i], collapse = ", "), ')')),
+                   name = groups[[i]],
+                   showlegend = FALSE)
+   # p <- add_ribbons(p, data = augment(test.fit),
+   #                  y = groupData[[y]],
+   #                  x = groupData[[x]],
+   #                  ymin = 0#~.fitted - 1.96 * .se.fit,
+   #                  ,ymax = 8#~.fitted + 1.96 * .se.fit,
+   #                  ,line = list(color = paste('rgba','(', paste(colors[, i], collapse = ", "), ', 0.05)')), 
+   #                  fillcolor = paste('rgba', '(', paste(colors[, i], collapse = ", "), ', 0.1)'),
+   #                  showlegend = FALSE)
+    p <- add_markers(p, data = groupData, 
+                     x = groupData[[x]], 
+                     y = groupData[[y]],
+                     symbol = groupData[[category]],
+                     marker = list(color=paste('rgb','(', paste(colors[, i], collapse = ", "))))
+  }
+  p <- layout(p, xaxis = list(title = x), yaxis = list(title = y))
+  return(p)
+}
+
+
+
 run_statistics("Fig1C_DGEP"
               ,groups_to_test = "MUT vs WT")
 
@@ -220,29 +330,57 @@ run_statistics("Fig2E_qPCR_OCI-Ly8_raw"
                                  ,"het+ARID1A vs WT")
               )
 
-run_statistics("Fig3E_qPCR_OCI-Ly1"
+run_statistics("Fig3E_qPCR_OCI-Ly1_raw"
               ,groups_to_test = c("het vs WT"
                                  ,"KO vs WT"
                                  )
               )
 
-run_statistics("Fig3E_qPCR_OCI-Ly8"
+run_statistics("Fig3E_qPCR_OCI-Ly8_raw"
               ,groups_to_test = c("het vs WT"
                                  ,"KO vs WT"
                                  ,"het+ARID1A vs WT")
               )
 
-run_statistics("Fig4C_luc_promoter1"
-              ,groups_to_test = c("50 ng vs 0 ng"
-                                 ,"200 ng vs 0 ng"
-                                 ,"500 ng vs 0 ng")
-              )
+# "Fig4C_luc_promoter1"
+data <- read.csv(file = paste0("./input/"
+                                  ,"Fig4C_luc_promoter1"
+                                  ,".tsv"
+                                  )
+                    ,sep = "\t"
+                     ,dec = ","
+                    ,header = TRUE)
+print(str(data))
 
-run_statistics("Fig4C_luc_promoter2"
-              ,groups_to_test = c("50 ng vs 0 ng"
-                                 ,"200 ng vs 0 ng"
-                                 ,"500 ng vs 0 ng")
-              )
+fit <- run_regression("Fig4C_luc_promoter1"
+                       ,formula = log10(value)~log10(dose+1)
+                      ,data = data
+                       ,export_results = TRUE
+                       )
+
+# plot 
+plot(log10(value)~log10(dose+1), data)
+abline(fit)
+
+# "Fig4C_luc_promoter2"
+data <- read.csv(file = paste0("./input/"
+                                  ,"Fig4C_luc_promoter2"
+                                  ,".tsv"
+                                  )
+                    ,sep = "\t"
+                     ,dec = ","
+                    ,header = TRUE)
+print(str(data))
+
+fit <- run_regression("Fig4C_luc_promoter2"
+                      ,formula = log10(value)~log10(dose+1)
+                      ,data = data
+                      ,export_results = TRUE
+                       )
+
+# plot 
+plot(log10(value)~log10(dose+1), data)
+abline(fit)
 
 run_statistics("Fig4F_qPCR_OCI-Ly8"
               ,groups_to_test = c("het+RUNX3 vs het"
@@ -256,37 +394,50 @@ run_statistics("Fig4G_FACS_OCI-Ly8"
                                  )
               )
 
-run_statistics("Fig5B_FACS_OCI-Ly1"
-              ,groups_to_test = c("het 0 ng vs WT 0 ng"
-                                 ,"het+RUNX3 0 ng vs WT 0 ng"
-                                 ,"KO 0 ng vs WT 0 ng"
-                                  ,"het 3 ng vs WT 3 ng"
-                                 ,"het+RUNX3 3 ng vs WT 3 ng"
-                                 ,"KO 3 ng vs WT 3 ng"
-                                  ,"het 30 ng vs WT 30 ng"
-                                 ,"het+RUNX3 30 ng vs WT 30 ng"
-                                 ,"KO 30 ng vs WT 30 ng"
-                                  ,"het 300 ng vs WT 300 ng"
-                                 ,"het+RUNX3 300 ng vs WT 300 ng"
-                                 ,"KO 300 ng vs WT 300 ng"
-                                 )
-              )
+# "Fig5B_FACS_OCI-Ly1"
 
-run_statistics("Fig5B_FACS_OCI-Ly8"
-              ,groups_to_test = c("het 0 ng vs WT 0 ng"
-                                 ,"het+RUNX3 0 ng vs WT 0 ng"
-                                 ,"KO 0 ng vs WT 0 ng"
-                                  ,"het 3 ng vs WT 3 ng"
-                                 ,"het+RUNX3 3 ng vs WT 3 ng"
-                                 ,"KO 3 ng vs WT 3 ng"
-                                  ,"het 30 ng vs WT 30 ng"
-                                 ,"het+RUNX3 30 ng vs WT 30 ng"
-                                 ,"KO 30 ng vs WT 30 ng"
-                                  ,"het 300 ng vs WT 300 ng"
-                                 ,"het+RUNX3 300 ng vs WT 300 ng"
-                                 ,"KO 300 ng vs WT 300 ng"
-                                 )
-              )
+data <- read.csv(file = paste0("./input/"
+                                  ,"Fig5B_FACS_OCI-Ly1"
+                                  ,".tsv"
+                                  )
+                    ,sep = "\t"
+                     ,dec = ","
+                    ,header = TRUE)
+print(str(data))
+
+library(lsmeans)
+fit <- run_regression("Fig5B_FACS_OCI-Ly1"
+                       ,formula = log10(value)~log10(dose+1)*genotype
+                      ,data = data
+                       ,export_results = FALSE
+                       )
+
+# compare fits
+compare_several_fits("Fig5B_FACS_OCI-Ly1",fit,X="genotype", var="dose")
+
+
+# "Fig5B_FACS_OCI-Ly8"
+
+data <- read.csv(file = paste0("./input/"
+                                  ,"Fig5B_FACS_OCI-Ly8"
+                                  ,".tsv"
+                                  )
+                    ,sep = "\t"
+                     ,dec = ","
+                    ,header = TRUE)
+print(str(data))
+
+library(lsmeans)
+fit <- run_regression("Fig5B_FACS_OCI-Ly1"
+                       ,formula = log10(value)~log2(dose+1)*genotype
+                      ,data = data
+                       ,export_results = FALSE
+                       )
+
+# compare fits
+compare_several_fits("Fig5B_FACS_OCI-Ly8",fit,X="genotype", var="dose")
+
+
 
 run_statistics("Fig5E_FACS_OCI-Ly8"
               ,groups_to_test = c("het+RUNX3 vs het"
