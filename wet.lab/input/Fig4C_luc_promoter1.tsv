@@ -1,13 +1,13 @@
-value	group	tec_rep	bio_rep	date
-1,10	0 ng	exp 1	NA	NA
-1,140215	0 ng	exp 2	NA	NA
-0,764579	0 ng	exp 3	NA	NA
-7,2	50 ng	exp 1	NA	NA
-5,7	50 ng	exp 2	NA	NA
-5,60	50 ng	exp 3	NA	NA
-16,3	200 ng	exp 1	NA	NA
-13	200 ng	exp 2	NA	NA
-12,7	200 ng	exp 3	NA	NA
-21,8	500 ng	exp 1	NA	NA
-22,40	500 ng	exp 2	NA	NA
-21,8	500 ng	exp 3	NA	NA
+value	group	tec_rep	bio_rep	date	dose
+1,10	0 ng	exp 1	NA	NA	0
+1,140215	0 ng	exp 2	NA	NA	0
+0,764579	0 ng	exp 3	NA	NA	0
+7,2	50 ng	exp 1	NA	NA	50
+5,7	50 ng	exp 2	NA	NA	50
+5,60	50 ng	exp 3	NA	NA	50
+16,3	200 ng	exp 1	NA	NA	200
+13	200 ng	exp 2	NA	NA	200
+12,7	200 ng	exp 3	NA	NA	200
+21,8	500 ng	exp 1	NA	NA	500
+22,40	500 ng	exp 2	NA	NA	500
+21,8	500 ng	exp 3	NA	NA	500
