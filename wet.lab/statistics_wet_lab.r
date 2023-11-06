@@ -1,5 +1,6 @@
 # install.packages("coin")
 require(coin)
+require(lsmeans)
 
 t_test <- function(data
                   ,...){
@@ -200,6 +201,9 @@ run_regression <- function(experiment
                           ,export_results = TRUE
                           ){
     fit <- lm(formula, data)
+    
+    print(plot(fit))
+    
     print(summary(fit))
     # export results
     output <- summary(fit)$coefficients
@@ -221,6 +225,7 @@ compare_several_fits <- function(experiment
                                 ,fit
                                  ,X
                                  ,var
+                                 ,logtransform=TRUE
                                 ){
     test.lst <- lstrends(fit, X, var)
     test.lst
@@ -242,7 +247,8 @@ compare_several_fits <- function(experiment
                  ,row.names = FALSE)
     
     # plot
-    data$log10_value <- log10(data$value)
+    if(logtransform){
+       data$log10_value <- log10(data$value)
     data$log10_dose <- log10(data$dose +1)
     plotly_interaction(data
                        ,x = "log10_dose"
@@ -251,7 +257,18 @@ compare_several_fits <- function(experiment
                       ,colors=col2rgb(c("black"
                                ,"lightblue"
                                ,"blue"
+                               ,"red"))) 
+    } else{
+        plotly_interaction(data
+                       ,x = "dose"
+                       ,y = "value"
+                       ,category = "genotype"
+                      ,colors=col2rgb(c("black"
+                               ,"lightblue"
+                               ,"blue"
                                ,"red")))
+    }
+    
 }
 
 plotly_interaction <- function(data
@@ -342,7 +359,27 @@ run_statistics("Fig3E_qPCR_OCI-Ly8_raw"
                                  ,"het+ARID1A vs WT")
               )
 
-# "Fig4C_luc_promoter1"
+# "Fig4C_luc_promoter1" original values
+data <- read.csv(file = paste0("./input/"
+                                  ,"Fig4C_luc_promoter1"
+                                  ,".tsv"
+                                  )
+                    ,sep = "\t"
+                     ,dec = ","
+                    ,header = TRUE)
+print(str(data))
+
+fit <- run_regression("Fig4C_luc_promoter1"
+                       ,formula = value~dose
+                      ,data = data
+                       ,export_results = TRUE
+                       )
+
+# plot 
+plot(value~dose, data)
+abline(fit)
+
+# "Fig4C_luc_promoter1" log-log transformed
 data <- read.csv(file = paste0("./input/"
                                   ,"Fig4C_luc_promoter1"
                                   ,".tsv"
@@ -362,7 +399,27 @@ fit <- run_regression("Fig4C_luc_promoter1"
 plot(log10(value)~log10(dose+1), data)
 abline(fit)
 
-# "Fig4C_luc_promoter2"
+# "Fig4C_luc_promoter2" original values
+data <- read.csv(file = paste0("./input/"
+                                  ,"Fig4C_luc_promoter2"
+                                  ,".tsv"
+                                  )
+                    ,sep = "\t"
+                     ,dec = ","
+                    ,header = TRUE)
+print(str(data))
+
+fit <- run_regression("Fig4C_luc_promoter2"
+                      ,formula = value~dose
+                      ,data = data
+                      ,export_results = TRUE
+                       )
+
+# plot 
+plot(value~dose, data)
+abline(fit)
+
+# "Fig4C_luc_promoter2" log-log transformed values
 data <- read.csv(file = paste0("./input/"
                                   ,"Fig4C_luc_promoter2"
                                   ,".tsv"
@@ -394,7 +451,7 @@ run_statistics("Fig4G_FACS_OCI-Ly8"
                                  )
               )
 
-# "Fig5B_FACS_OCI-Ly1"
+# "Fig5B_FACS_OCI-Ly1" original values
 
 data <- read.csv(file = paste0("./input/"
                                   ,"Fig5B_FACS_OCI-Ly1"
@@ -403,9 +460,39 @@ data <- read.csv(file = paste0("./input/"
                     ,sep = "\t"
                      ,dec = ","
                     ,header = TRUE)
+
+data$genotype <- factor(data$genotype
+                        , levels=c("WT", "het", "het+RUNX3", "KO" )
+                        ,ordered = TRUE
+                       )
 print(str(data))
 
-library(lsmeans)
+fit <- run_regression("Fig5B_FACS_OCI-Ly1"
+                       ,formula = value~dose*genotype
+                      ,data = data
+                       ,export_results = FALSE
+                       )
+
+# compare fits
+compare_several_fits("Fig5B_FACS_OCI-Ly1",fit,X="genotype", var="dose", logtransform = FALSE)
+
+
+# "Fig5B_FACS_OCI-Ly1" log-log transformed values
+
+data <- read.csv(file = paste0("./input/"
+                                  ,"Fig5B_FACS_OCI-Ly1"
+                                  ,".tsv"
+                                  )
+                    ,sep = "\t"
+                     ,dec = ","
+                    ,header = TRUE)
+
+data$genotype <- factor(data$genotype
+                        , levels=c("WT", "het", "het+RUNX3", "KO" )
+                        ,ordered = TRUE
+                       )
+print(str(data))
+
 fit <- run_regression("Fig5B_FACS_OCI-Ly1"
                        ,formula = log10(value)~log10(dose+1)*genotype
                       ,data = data
@@ -416,7 +503,8 @@ fit <- run_regression("Fig5B_FACS_OCI-Ly1"
 compare_several_fits("Fig5B_FACS_OCI-Ly1",fit,X="genotype", var="dose")
 
 
-# "Fig5B_FACS_OCI-Ly8"
+
+# "Fig5B_FACS_OCI-Ly8" original values
 
 data <- read.csv(file = paste0("./input/"
                                   ,"Fig5B_FACS_OCI-Ly8"
@@ -425,10 +513,39 @@ data <- read.csv(file = paste0("./input/"
                     ,sep = "\t"
                      ,dec = ","
                     ,header = TRUE)
+data$genotype <- factor(data$genotype
+                        , levels=c("WT", "het", "het+RUNX3", "KO" )
+                        ,ordered = TRUE
+                       )
 print(str(data))
 
-library(lsmeans)
-fit <- run_regression("Fig5B_FACS_OCI-Ly1"
+fit <- run_regression("Fig5B_FACS_OCI-Ly8"
+                       ,formula = value~dose*genotype
+                      ,data = data
+                       ,export_results = FALSE
+                       )
+
+# compare fits
+compare_several_fits("Fig5B_FACS_OCI-Ly8",fit,X="genotype", var="dose", logtransform = FALSE)
+
+
+
+# "Fig5B_FACS_OCI-Ly8" log-log transformed values
+
+data <- read.csv(file = paste0("./input/"
+                                  ,"Fig5B_FACS_OCI-Ly8"
+                                  ,".tsv"
+                                  )
+                    ,sep = "\t"
+                     ,dec = ","
+                    ,header = TRUE)
+data$genotype <- factor(data$genotype
+                        , levels=c("WT", "het", "het+RUNX3", "KO" )
+                        ,ordered = TRUE
+                       )
+print(str(data))
+
+fit <- run_regression("Fig5B_FACS_OCI-Ly8"
                        ,formula = log10(value)~log2(dose+1)*genotype
                       ,data = data
                        ,export_results = FALSE
@@ -436,6 +553,7 @@ fit <- run_regression("Fig5B_FACS_OCI-Ly1"
 
 # compare fits
 compare_several_fits("Fig5B_FACS_OCI-Ly8",fit,X="genotype", var="dose")
+
 
 
 
