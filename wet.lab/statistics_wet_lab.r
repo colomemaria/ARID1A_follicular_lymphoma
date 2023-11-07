@@ -1,6 +1,5 @@
 # install.packages("coin")
 require(coin)
-require(lsmeans)
 
 t_test <- function(data
                   ,...){
@@ -48,13 +47,13 @@ run_statistics <- function(experiment
                     ,sep = "\t"
                      ,dec = ","
                     ,header = TRUE)
-    print(str(data)) # REMOVE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    print(str(data))
     cat('\n')
     
     # how many groups we have?
     groups <- unique(data$group)
     print("we have following groups in the data:")
-    print(groups) # REMOVE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    print(groups)
     cat('\n')
     
     all_vs_all <- (length(groups >2)) & is.na(groups_to_test) # TRUE or FALSE
@@ -73,13 +72,13 @@ run_statistics <- function(experiment
                        idx_group <- data$group == group
                        pvalue <- shapiro.test(data$value[idx_group])$p.value
                        
-                       print(group) # REMOVE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                       ifelse(pvalue <= 0.05,print("non-normal"),print("normal")) # REMOVE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                       print(group)
+                       ifelse(pvalue <= 0.05,print("non-normal"),print("normal"))
                        pvalue <= 0.05
                    })
     norm_dist <- sum(not_norm)== 0 # TRUE or FALSE
-    print("overall distribution is:") # REMOVE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    ifelse(norm_dist,print("normal"),print("non-normal")) # REMOVE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    print("overall distribution is:")
+    ifelse(norm_dist,print("normal"),print("non-normal")) 
     cat('\n')
     
     ### check the homogeneity of variance assumption in all groups
@@ -94,8 +93,8 @@ run_statistics <- function(experiment
     }
     
     homo_var <- sum(not_homogeneic)== 0 # TRUE or FALSE
-    print("overall variance is:") # REMOVE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    ifelse(homo_var,print("stable"),print("non-stable")) # REMOVE THIS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    print("overall variance is:") 
+    ifelse(homo_var,print("stable"),print("non-stable")) 
     
     ### pick the test
     which_test <- if(norm_dist){ 
@@ -198,6 +197,7 @@ run_statistics <- function(experiment
 run_regression <- function(experiment
                            ,formula
                            ,data
+                           ,adjustment_method = "bonferroni"
                           ,export_results = TRUE
                           ){
     fit <- lm(formula, data)
@@ -206,7 +206,16 @@ run_regression <- function(experiment
     
     print(summary(fit))
     # export results
-    output <- summary(fit)$coefficients
+    output <- as.data.frame(summary(fit)$coefficients)
+    
+    # adjust for multiple testing if needed
+    groups <- unique(data$genotype)
+    if(length(groups)> 1){
+        output$p.adj <- p.adjust(output[,'Pr(>|t|)']
+                                ,method = adjustment_method)
+    }
+    
+    print(output)
     if(export_results){
         write.table(output
                  ,file = paste0("./output/"
@@ -216,106 +225,10 @@ run_regression <- function(experiment
                  ,sep = "\t"
                  ,quote = FALSE
                  ,col.names = TRUE
-                 ,row.names = FALSE)
+                 ,row.names = TRUE)
     }
     fit
 }
-
-compare_several_fits <- function(experiment
-                                ,fit
-                                 ,X
-                                 ,var
-                                 ,logtransform=TRUE
-                                ){
-    test.lst <- lstrends(fit, X, var)
-    test.lst
-    
-    # Compare slopes
-    pairs(test.lst)
-    print(summary(pairs(test.lst)))
-    
-    # export output
-    output <- summary(pairs(test.lst))
-    write.table(output
-                 ,file = paste0("./output/"
-                                ,experiment
-                                ,"_stats.tsv"
-                                )
-                 ,sep = "\t"
-                 ,quote = FALSE
-                 ,col.names = TRUE
-                 ,row.names = FALSE)
-    
-    # plot
-    if(logtransform){
-       data$log10_value <- log10(data$value)
-    data$log10_dose <- log10(data$dose +1)
-    plotly_interaction(data
-                       ,x = "log10_dose"
-                       ,y = "log10_value"
-                       ,category = "genotype"
-                      ,colors=col2rgb(c("black"
-                               ,"lightblue"
-                               ,"blue"
-                               ,"red"))) 
-    } else{
-        plotly_interaction(data
-                       ,x = "dose"
-                       ,y = "value"
-                       ,category = "genotype"
-                      ,colors=col2rgb(c("black"
-                               ,"lightblue"
-                               ,"blue"
-                               ,"red")))
-    }
-    
-}
-
-plotly_interaction <- function(data
-                               , x
-                               , y
-                               , category
-                               , colors = col2rgb(viridis(nlevels(as.factor(data[[category]]))))
-                               , ...) {
-  # Create Plotly scatter plot of x vs y, with separate lines for each level of the categorical variable. 
-  # In other words, create an interaction scatter plot.
-  # The "colors" must be supplied in a RGB triplet, as produced by col2rgb().
-
-  require(plotly)
-  require(viridis)
-  require(broom)
-
-  groups <- unique(data[[category]])
-
-  p <- plot_ly(...)
-
-  for (i in 1:length(groups)) {
-    groupData = data[which(data[[category]]==groups[[i]]), ]
-    p <- add_lines(p, data = groupData,
-                   y = fitted(lm(data = groupData, groupData[[y]] ~ groupData[[x]])),
-                   x = groupData[[x]],
-                   line = list(color = paste('rgb', '(', paste(colors[, i], collapse = ", "), ')')),
-                   name = groups[[i]],
-                   showlegend = FALSE)
-   # p <- add_ribbons(p, data = augment(test.fit),
-   #                  y = groupData[[y]],
-   #                  x = groupData[[x]],
-   #                  ymin = 0#~.fitted - 1.96 * .se.fit,
-   #                  ,ymax = 8#~.fitted + 1.96 * .se.fit,
-   #                  ,line = list(color = paste('rgba','(', paste(colors[, i], collapse = ", "), ', 0.05)')), 
-   #                  fillcolor = paste('rgba', '(', paste(colors[, i], collapse = ", "), ', 0.1)'),
-   #                  showlegend = FALSE)
-    p <- add_markers(p, data = groupData, 
-                     x = groupData[[x]], 
-                     y = groupData[[y]],
-                     symbol = groupData[[category]],
-                     marker = list(color=paste('rgb','(', paste(colors[, i], collapse = ", "))))
-  }
-  p <- layout(p, xaxis = list(title = x), yaxis = list(title = y))
-  return(p)
-}
-
-
 
 run_statistics("Fig1C_DGEP"
               ,groups_to_test = "MUT vs WT")
@@ -359,7 +272,7 @@ run_statistics("Fig3E_qPCR_OCI-Ly8_raw"
                                  ,"het+ARID1A vs WT")
               )
 
-# "Fig4C_luc_promoter1" original values
+# "Fig4C_luc_promoter1" 
 data <- read.csv(file = paste0("./input/"
                                   ,"Fig4C_luc_promoter1"
                                   ,".tsv"
@@ -370,36 +283,16 @@ data <- read.csv(file = paste0("./input/"
 print(str(data))
 
 fit <- run_regression("Fig4C_luc_promoter1"
-                       ,formula = value~dose
+                       ,formula = value~sqrt(dose)
                       ,data = data
                        ,export_results = TRUE
                        )
 
 # plot 
-plot(value~dose, data)
+plot(value~sqrt(dose), data)
 abline(fit)
 
-# "Fig4C_luc_promoter1" log-log transformed
-data <- read.csv(file = paste0("./input/"
-                                  ,"Fig4C_luc_promoter1"
-                                  ,".tsv"
-                                  )
-                    ,sep = "\t"
-                     ,dec = ","
-                    ,header = TRUE)
-print(str(data))
-
-fit <- run_regression("Fig4C_luc_promoter1"
-                       ,formula = log10(value)~log10(dose+1)
-                      ,data = data
-                       ,export_results = TRUE
-                       )
-
-# plot 
-plot(log10(value)~log10(dose+1), data)
-abline(fit)
-
-# "Fig4C_luc_promoter2" original values
+# "Fig4C_luc_promoter2" 
 data <- read.csv(file = paste0("./input/"
                                   ,"Fig4C_luc_promoter2"
                                   ,".tsv"
@@ -410,33 +303,13 @@ data <- read.csv(file = paste0("./input/"
 print(str(data))
 
 fit <- run_regression("Fig4C_luc_promoter2"
-                      ,formula = value~dose
+                      ,formula = value~sqrt(dose)
                       ,data = data
                       ,export_results = TRUE
                        )
 
 # plot 
-plot(value~dose, data)
-abline(fit)
-
-# "Fig4C_luc_promoter2" log-log transformed values
-data <- read.csv(file = paste0("./input/"
-                                  ,"Fig4C_luc_promoter2"
-                                  ,".tsv"
-                                  )
-                    ,sep = "\t"
-                     ,dec = ","
-                    ,header = TRUE)
-print(str(data))
-
-fit <- run_regression("Fig4C_luc_promoter2"
-                      ,formula = log10(value)~log10(dose+1)
-                      ,data = data
-                      ,export_results = TRUE
-                       )
-
-# plot 
-plot(log10(value)~log10(dose+1), data)
+plot(value~sqrt(dose), data)
 abline(fit)
 
 run_statistics("Fig4F_qPCR_OCI-Ly8"
@@ -451,7 +324,7 @@ run_statistics("Fig4G_FACS_OCI-Ly8"
                                  )
               )
 
-# "Fig5B_FACS_OCI-Ly1" original values
+# "Fig5B_FACS_OCI-Ly1" 
 
 data <- read.csv(file = paste0("./input/"
                                   ,"Fig5B_FACS_OCI-Ly1"
@@ -463,48 +336,16 @@ data <- read.csv(file = paste0("./input/"
 
 data$genotype <- factor(data$genotype
                         , levels=c("WT", "het", "het+RUNX3", "KO" )
-                        ,ordered = TRUE
                        )
 print(str(data))
 
 fit <- run_regression("Fig5B_FACS_OCI-Ly1"
-                       ,formula = value~dose*genotype
+                       ,formula = value~sqrt(dose)*genotype
                       ,data = data
-                       ,export_results = FALSE
+                       ,export_results = TRUE
                        )
 
-# compare fits
-compare_several_fits("Fig5B_FACS_OCI-Ly1",fit,X="genotype", var="dose", logtransform = FALSE)
-
-
-# "Fig5B_FACS_OCI-Ly1" log-log transformed values
-
-data <- read.csv(file = paste0("./input/"
-                                  ,"Fig5B_FACS_OCI-Ly1"
-                                  ,".tsv"
-                                  )
-                    ,sep = "\t"
-                     ,dec = ","
-                    ,header = TRUE)
-
-data$genotype <- factor(data$genotype
-                        , levels=c("WT", "het", "het+RUNX3", "KO" )
-                        ,ordered = TRUE
-                       )
-print(str(data))
-
-fit <- run_regression("Fig5B_FACS_OCI-Ly1"
-                       ,formula = log10(value)~log10(dose+1)*genotype
-                      ,data = data
-                       ,export_results = FALSE
-                       )
-
-# compare fits
-compare_several_fits("Fig5B_FACS_OCI-Ly1",fit,X="genotype", var="dose")
-
-
-
-# "Fig5B_FACS_OCI-Ly8" original values
+# "Fig5B_FACS_OCI-Ly8" 
 
 data <- read.csv(file = paste0("./input/"
                                   ,"Fig5B_FACS_OCI-Ly8"
@@ -515,46 +356,15 @@ data <- read.csv(file = paste0("./input/"
                     ,header = TRUE)
 data$genotype <- factor(data$genotype
                         , levels=c("WT", "het", "het+RUNX3", "KO" )
-                        ,ordered = TRUE
+#,ordered = TRUE
                        )
 print(str(data))
 
 fit <- run_regression("Fig5B_FACS_OCI-Ly8"
-                       ,formula = value~dose*genotype
+                       ,formula = value~sqrt(dose)*genotype
                       ,data = data
-                       ,export_results = FALSE
+                       ,export_results = TRUE
                        )
-
-# compare fits
-compare_several_fits("Fig5B_FACS_OCI-Ly8",fit,X="genotype", var="dose", logtransform = FALSE)
-
-
-
-# "Fig5B_FACS_OCI-Ly8" log-log transformed values
-
-data <- read.csv(file = paste0("./input/"
-                                  ,"Fig5B_FACS_OCI-Ly8"
-                                  ,".tsv"
-                                  )
-                    ,sep = "\t"
-                     ,dec = ","
-                    ,header = TRUE)
-data$genotype <- factor(data$genotype
-                        , levels=c("WT", "het", "het+RUNX3", "KO" )
-                        ,ordered = TRUE
-                       )
-print(str(data))
-
-fit <- run_regression("Fig5B_FACS_OCI-Ly8"
-                       ,formula = log10(value)~log2(dose+1)*genotype
-                      ,data = data
-                       ,export_results = FALSE
-                       )
-
-# compare fits
-compare_several_fits("Fig5B_FACS_OCI-Ly8",fit,X="genotype", var="dose")
-
-
 
 
 run_statistics("Fig5E_FACS_OCI-Ly8"
