@@ -1,0 +1,10 @@
+value	group	tec_rep	bio_rep	date
+1	WT	exp 1	NA	NA
+1	WT	exp 2	NA	NA
+1	WT	exp 3	NA	NA
+0,42	het	exp 1	NA	NA
+0,71	het	exp 2	NA	NA
+0,1	het	exp 3	NA	NA
+0,23	KO	exp 1	NA	NA
+0,31	KO	exp 2	NA	NA
+0,04	KO	exp 3	NA	NA
