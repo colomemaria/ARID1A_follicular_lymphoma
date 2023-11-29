@@ -38,6 +38,7 @@ run_statistics <- function(experiment
                           # If there are more than two groups in the dataset, by default all vs all groups will be tested. 
                           # Provide character vector in form of e.g. c("het vs WT", "KO vs WT") to perform only selected comparisons
                          ,adjustment_method = "bonferroni"
+                           ,is_fold_change = FALSE
                           ){
     # read in data
     data <- read.csv(file = paste0("./input/"
@@ -63,6 +64,16 @@ run_statistics <- function(experiment
     paired <- sum(!is.na(data$bio_rep)) # TRUE or FALSE
     if(paired) {print("data are paired observations")}
     cat('\n')
+    
+    # check if we have a "flod change" type of data
+    # if yes, we will have to remove the WT column, because there all experiments have the same value (1 if FC or 0, if log2FC)
+    # this will give us trouble while running the Shapiro test, since these values will have no variance
+    # NOTE: we thus can not do comparisons to the WT
+    if(is_fold_change){
+        data <- data[data$group != "WT",]
+        groups <- groups[groups != "WT"]
+        if(sum(grepl("WT", groups_to_test)) != 0) stop("ERROR: for the fold change type of data, we can not compare to the WT group")
+    }
 
     # pick the correct test
     ### check the normality of distribution assumption in all groups
@@ -152,7 +163,7 @@ run_statistics <- function(experiment
                        ,"met"
                        ,"not met"
                        )
-                 ," and the homogeneity of variace assumption is "
+                 ," and the homogeneity of variance assumption is "
                  ,ifelse(homo_var
                         ,"met"
                         ,"not met"
@@ -313,22 +324,27 @@ plot(value~sqrt(dose), data)
 abline(fit)
 
 run_statistics("Fig4F_qPCR_OCI-Ly8"
-              ,groups_to_test = c("het+RUNX3 vs het"
-                                 ,"het+RUNX3 vs WT"
+              ,groups_to_test = c("het+RUNX3 vs het")
+               ,is_fold_change = TRUE
+              )
+
+run_statistics("Fig4F_qPCR_OCI-Ly8_raw"
+              ,groups_to_test = c("het vs WT"
+                                  ,"het+RUNX3 vs WT"
+                                  ,"KO vs WT"
+                                  ,"het+RUNX3 vs het"
                                  )
               )
 
-run_statistics("Fig4G_FACS_OCI-Ly8"
-              ,groups_to_test = c("het+RUNX3 vs het"
-                                 ,"het+RUNX3 vs WT"
-                                 )
+run_statistics("Fig4G_FACS_OCI-Ly8_log2FC"
+              ,groups_to_test = c("het+RUNX3 vs het")
+               ,is_fold_change = TRUE
               )
 
 # "Fig5B_FACS_OCI-Ly1" 
 
 data <- read.csv(file = paste0("./input/"
-                                  ,"Fig5B_FACS_OCI-Ly1"
-                                  ,".tsv"
+                                  ,"Fig5B_FACS_OCI-Ly1.tsv"
                                   )
                     ,sep = "\t"
                      ,dec = ","
@@ -348,8 +364,7 @@ fit <- run_regression("Fig5B_FACS_OCI-Ly1"
 # "Fig5B_FACS_OCI-Ly8" 
 
 data <- read.csv(file = paste0("./input/"
-                                  ,"Fig5B_FACS_OCI-Ly8"
-                                  ,".tsv"
+                                  ,"Fig5B_FACS_OCI-Ly8.tsv"
                                   )
                     ,sep = "\t"
                      ,dec = ","
@@ -367,25 +382,27 @@ fit <- run_regression("Fig5B_FACS_OCI-Ly8"
                        )
 
 
-run_statistics("Fig5E_FACS_OCI-Ly8"
-              ,groups_to_test = c("het+RUNX3 vs het"
-                                 ,"het+RUNX3 vs WT"
-                                 )
-              )
+run_statistics("Fig5E_FACS_OCI-Ly8_log2FC"
+              ,groups_to_test = c("het+RUNX3 vs het")
+               ,is_fold_change = TRUE
+               )
 
 run_statistics("FigS1B_FACS"
               ,groups_to_test = c("MUT vs WT")
               )
 
-run_statistics("FigS2D_qPCR_OCI-Ly1"
+run_statistics("FigS2D_qPCR_OCI-Ly1_raw"
               ,groups_to_test = c("het vs WT"
-                                 ,"het+RUNX3 vs WT"
+                                  ,"het+RUNX3 vs WT"
+                                  ,"KO vs WT"
                                  )
+               ,adjustment_method = "fdr"
               )
 
 run_statistics("FigS2E_FACS_OCI-Ly1"
-              ,groups_to_test = c("het+RUNX3 vs het"
-                                 ,"het+RUNX3 vs WT"
+              ,groups_to_test = c("het vs WT"
+                                  ,"het+RUNX3 vs WT"
+                                  ,"KO vs WT"
                                  )
               )
 
