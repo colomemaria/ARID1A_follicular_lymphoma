@@ -1,0 +1,13 @@
+value	group	tec_rep	bio_rep
+7,00	WT	exp 1	exp 1
+6,34	WT	exp 2	exp 2
+6,31	WT	exp 3	exp 3
+7,87	het	exp 1	exp 1
+8,48	het	exp 2	exp 2
+8,32	het	exp 3	exp 3
+8,04	KO	exp 1	exp 1
+7,60	KO	exp 2	exp 2
+6,95	KO	exp 3	exp 3
+7,36	het+ARID1A	exp 1	exp 1
+7,17	het+ARID1A	exp 2	exp 2
+7,31	het+ARID1A	exp 3	exp 3
