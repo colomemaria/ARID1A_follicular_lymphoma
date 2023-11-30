@@ -259,30 +259,6 @@ run_statistics("Fig2B_FACS_OCI-Ly8"
                                  ,"het+ARID1A vs WT")
               )
 
-run_statistics("Fig2E_qPCR_OCI-Ly1_raw"
-              ,groups_to_test = c("het vs WT"
-                                 ,"KO vs WT"
-                                 )
-              )
-
-run_statistics("Fig2E_qPCR_OCI-Ly8_raw"
-              ,groups_to_test = c("het vs WT"
-                                 ,"KO vs WT"
-                                 ,"het+ARID1A vs WT")
-              )
-
-run_statistics("Fig3E_qPCR_OCI-Ly1_raw"
-              ,groups_to_test = c("het vs WT"
-                                 ,"KO vs WT"
-                                 )
-              )
-
-run_statistics("Fig3E_qPCR_OCI-Ly8_raw"
-              ,groups_to_test = c("het vs WT"
-                                 ,"KO vs WT"
-                                 ,"het+ARID1A vs WT")
-              )
-
 # "Fig4C_luc_promoter1" 
 data <- read.csv(file = paste0("./input/"
                                   ,"Fig4C_luc_promoter1"
@@ -322,11 +298,6 @@ fit <- run_regression("Fig4C_luc_promoter2"
 # plot 
 plot(value~sqrt(dose), data)
 abline(fit)
-
-run_statistics("Fig4F_qPCR_OCI-Ly8"
-              ,groups_to_test = c("het+RUNX3 vs het")
-               ,is_fold_change = TRUE
-              )
 
 run_statistics("Fig4F_qPCR_OCI-Ly8_raw"
               ,groups_to_test = c("het vs WT"
@@ -391,7 +362,31 @@ run_statistics("FigS1B_FACS"
               ,groups_to_test = c("MUT vs WT")
               )
 
-run_statistics("FigS2D_qPCR_OCI-Ly1_raw"
+run_statistics("FigS1C_qPCR_OCI-Ly1_raw"
+              ,groups_to_test = c("het vs WT"
+                                 ,"KO vs WT"
+                                 )
+              )
+
+run_statistics("FigS1C_qPCR_OCI-Ly8_raw"
+              ,groups_to_test = c("het vs WT"
+                                 ,"KO vs WT"
+                                 ,"het+ARID1A vs WT")
+              )
+
+run_statistics("FigS2E_qPCR_OCI-Ly1_raw"
+              ,groups_to_test = c("het vs WT"
+                                 ,"KO vs WT"
+                                 )
+              )
+
+run_statistics("FigS2E_qPCR_OCI-Ly8_raw"
+              ,groups_to_test = c("het vs WT"
+                                 ,"KO vs WT"
+                                 ,"het+ARID1A vs WT")
+              )
+
+run_statistics("FigS3D_qPCR_OCI-Ly1_raw"
               ,groups_to_test = c("het vs WT"
                                   ,"het+RUNX3 vs WT"
                                   ,"KO vs WT"
@@ -399,11 +394,10 @@ run_statistics("FigS2D_qPCR_OCI-Ly1_raw"
                ,adjustment_method = "fdr"
               )
 
-run_statistics("FigS2E_FACS_OCI-Ly1"
-              ,groups_to_test = c("het vs WT"
-                                  ,"het+RUNX3 vs WT"
-                                  ,"KO vs WT"
-                                 )
+run_statistics("FigS3E_FACS_OCI-Ly1_log2FC"
+              ,groups_to_test = c("het+RUNX3 vs het")
+               ,
+               ,is_fold_change = TRUE
               )
 
 sessionInfo()
